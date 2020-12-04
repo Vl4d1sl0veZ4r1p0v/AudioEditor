@@ -26,7 +26,7 @@ class DigitalSignal:
         return mp3_audio
 
     def plot_wave(self, ys, signal_length):
-        time = np.linspace(0., , ys.shape[0] // 10)
+        time = np.linspace(0., ys.shape[0] // 10)
         # two channels if stereo
         if ys.ndim == 2:
             plt.plot(time, ys[:, 0], label="Left channel")
