@@ -44,7 +44,7 @@ def test_load_from_wav():
     # save part
     audio = core.Audio()
     wave = audio.from_wav(filename)
-    assert wave.audio == ys
+    assert wave.audio_segment == ys
 
 
 def test_load_from_mp3():

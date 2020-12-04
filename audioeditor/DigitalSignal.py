@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pydub import AudioSegment
-from pydub.playback import play
 from scipy.io import wavfile
 
 
@@ -38,18 +37,5 @@ class DigitalSignal:
         plt.ylabel("Amplitude")
         plt.show()
 
-
     def save_into_wav(filename, signal_sample_rate, signal_values):
         wavfile.write(filename, signal_sample_rate, signal_values)
-
-
-
-
-
-
-if __name__ == "__main__":
-    # samplerate, data, length = read_wav("test.wav")
-    # plot_wave(data, length)s
-    # save_into_wav("test_write.wav", samplerate, data)
-    read_mp3("test.wav")
-    play(sound)
