@@ -139,3 +139,7 @@ cython_debug/
 
 # IDE meta
 .idea/
+
+# Other files
+*.zip
+!test_*.wav
