@@ -17,6 +17,7 @@ class Audio:
 
     def from_mp3(self, file_name):
         self.audio_segment = AudioSegment.from_file(file_name, format="mp3")
+        self.rate = self.audio_segment.frame_rate
         self.audio_segment = np.array(
             self.audio_segment.get_array_of_samples())
 
@@ -94,7 +95,7 @@ class Audio:
 
     def get_fade_in(self, duration):
         self_audio = AudioSegment(
-            self.audio_segment.tobytes(),
+            data=self.audio_segment.tobytes(),
             frame_rate=self.rate,
             sample_width=self.audio_segment.dtype.itemsize,
             channels=1
@@ -126,10 +127,12 @@ class Audio:
 
 
 if __name__ == "__main__":
-    filename = "../tests/audios/test.wav"
+    filename = "05.SMOKE.mp3"
     audio = Audio()
-    audio.from_wav(filename)
-    faded_in_audio = audio.get_fade_in(1000)
-    faded_out_audio = audio.get_fade_out(1000)
-    faded_in_audio.save_to_mp3("feded_in.mp3")
-    faded_out_audio.save_to_mp3("faded_out.mp3")
+    audio.from_mp3(filename)
+    # faded_in_audio = audio.get_fade_in(4000)
+    # faded_out_audio = audio.get_fade_out(4000)
+    # faded_in_audio.save_to_wav("feded_in.wav")
+    # faded_out_audio.save_to_wav("faded_out.wav")
+    faded_in = self_audio.fade_in(duration=30000)
+    faded_in.export("smoke_faded_in.mp3", format='mp3')
