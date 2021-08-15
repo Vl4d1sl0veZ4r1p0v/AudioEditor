@@ -1,6 +1,5 @@
 import numpy as np
 
-from math import floor, ceil
 from pydub import AudioSegment
 
 
@@ -93,27 +92,44 @@ class Audio:
         result.rate = self_audio.frame_rate
         return result
 
-    def get_fade_in(self):
-        pass
-
-    def get_fade_out(self):
-        signal = np.array(self.audio_segment)
-        kernel = self.get_kernel()
-        return np.convolve(signal, kernel, mode='same')
-
-    def get_kernel(self, ratio=0.1):
-        kernel = np.concatenate(
-            [
-                np.ones(floor(len(self.audio_segment) * (1 - ratio))),
-                0.5 ** np.arange(1, ceil(len(self.audio_segment) * ratio) + 1)
-            ]
+    def get_fade_in(self, duration):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
         )
-        return kernel
+        self_audio.fade_in(
+            duration=duration
+        )
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
+
+    def get_fade_out(self, duration):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        self_audio.fade_out(
+            duration=duration
+        )
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
 
 
 if __name__ == "__main__":
     filename = "../tests/audios/test.wav"
     audio = Audio()
     audio.from_wav(filename)
-    audio.audio_segment = audio.get_fade_out()
-    audio.save_to_mp3("feded_out_test.mp3")
+    faded_in_audio = audio.get_fade_in(1000)
+    faded_out_audio = audio.get_fade_out(1000)
+    faded_in_audio.save_to_mp3("feded_in.mp3")
+    faded_out_audio.save_to_mp3("faded_out.mp3")
