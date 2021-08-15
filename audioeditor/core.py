@@ -1,5 +1,6 @@
 import numpy as np
 
+from math import floor, ceil
 from pydub import AudioSegment
 
 
@@ -96,16 +97,23 @@ class Audio:
         pass
 
     def get_fade_out(self):
-        pass
+        signal = np.array(self.audio_segment)
+        kernel = self.get_kernel()
+        return np.convolve(signal, kernel, mode='same')
 
-    def get_fade(self):
-        pass
-
+    def get_kernel(self, ratio=0.1):
+        kernel = np.concatenate(
+            [
+                np.ones(floor(len(self.audio_segment) * (1 - ratio))),
+                0.5 ** np.arange(1, ceil(len(self.audio_segment) * ratio) + 1)
+            ]
+        )
+        return kernel
 
 
 if __name__ == "__main__":
     filename = "../tests/audios/test.wav"
     audio = Audio()
     audio.from_wav(filename)
-
-
+    audio.audio_segment = audio.get_fade_out()
+    audio.save_to_mp3("feded_out_test.mp3")
