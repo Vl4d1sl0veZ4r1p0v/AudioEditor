@@ -1,6 +1,7 @@
 import numpy as np
 
 from pydub import AudioSegment
+from pydub.playback import play
 
 
 class Audio:
@@ -125,14 +126,32 @@ class Audio:
         result.rate = self_audio.frame_rate
         return result
 
+    def change_pitch(self, octaves=1.0):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        new_sample_rate = int(self_audio.frame_rate * (2.0 ** octaves))
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
+
+    def play(self):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        play(self_audio)
+
 
 if __name__ == "__main__":
     filename = "05.SMOKE.mp3"
     audio = Audio()
     audio.from_mp3(filename)
-    # faded_in_audio = audio.get_fade_in(4000)
-    # faded_out_audio = audio.get_fade_out(4000)
-    # faded_in_audio.save_to_wav("feded_in.wav")
-    # faded_out_audio.save_to_wav("faded_out.wav")
-    faded_in = self_audio.fade_in(duration=30000)
-    faded_in.export("smoke_faded_in.mp3", format='mp3')
+    audio.play()
