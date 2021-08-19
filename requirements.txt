@@ -1,3 +1,5 @@
-pytest
-pydub
-numpy
+pytest~=6.2.4
+pydub~=0.25.1
+numpy~=1.21.2
+
+matplotlib~=3.4.3
