@@ -1,79 +1,61 @@
+import random
+import sys
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 
 from core import Audio
 
+matplotlib.use('Qt5Agg')
 
-# def live_update_demo(blit=False):
-#     x = np.linspace(0, 50., num=100)
-#     X, Y = np.meshgrid(x, x)
-#     fig = plt.figure()
-#     ax1 = fig.add_subplot(2, 1, 1)
-#     ax2 = fig.add_subplot(2, 1, 2)
-#
-#     img = ax1.imshow(X, vmin=-1, vmax=1, interpolation="None", cmap="RdBu")
-#
-#     line, = ax2.plot([], lw=3)
-#     text = ax2.text(0.8, 0.5, "")
-#
-#     ax2.set_xlim(x.min(), x.max())
-#     ax2.set_ylim([-1.1, 1.1])
-#
-#     fig.canvas.draw()  # note that the first draw comes before setting data
-#
-#     if blit:
-#         # cache the background
-#         axbackground = fig.canvas.copy_from_bbox(ax1.bbox)
-#         ax2background = fig.canvas.copy_from_bbox(ax2.bbox)
-#
-#     plt.show(block=False)
-#
-#     t_start = time.time()
-#     k = 0.
-#
-#     for i in np.arange(1000):
-#         img.set_data(np.sin(X / 3. + k) * np.cos(Y / 3. + k))
-#         line.set_data(x, np.sin(x / 3. + k))
-#         tx = 'Mean Frame Rate:\n {fps:.3f}FPS'.format(fps=((i + 1) / (time.time() - t_start)))
-#         text.set_text(tx)
-#         # print tx
-#         k += 0.11
-#         if blit:
-#             # restore background
-#             fig.canvas.restore_region(axbackground)
-#             fig.canvas.restore_region(ax2background)
-#
-#             # redraw just the points
-#             ax1.draw_artist(img)
-#             ax2.draw_artist(line)
-#             ax2.draw_artist(text)
-#
-#             # fill in the axes rectangle
-#             fig.canvas.blit(ax1.bbox)
-#             fig.canvas.blit(ax2.bbox)
-#
-#             # in this post http://bastibe.de/2013-05-30-speeding-up-matplotlib.html
-#             # it is mentionned that blit causes strong memory leakage.
-#             # however, I did not observe that.
-#
-#         else:
-#             # redraw everything
-#             fig.canvas.draw()
-#
-#         fig.canvas.flush_events()
-#         # alternatively you could use
-#         # plt.pause(0.000000000001)
-#         # however plt.pause calls canvas.draw(), as can be read here:
-#         # http://bastibe.de/2013-05-30-speeding-up-matplotlib.html
+from PyQt5 import QtCore, QtWidgets
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+
+class MplCanvas(FigureCanvas):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
+
+
+class MainWindow(QtWidgets.QMainWindow):
+
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+
+        self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
+        self.setCentralWidget(self.canvas)
+
+        audio = Audio()
+        audio.from_wav("../tests/audios/test.wav")
+        self.dense = 1e-100
+        self.xdata = np.linspace(0, len(audio.audio_segment) / audio.rate, num=len(audio.audio_segment * self.dense))
+        self.ydata = audio.audio_segment
+        self._plot_ref = None
+        self.update_plot()
+
+        self.show()
+
+        # self.timer = QtCore.QTimer()
+        # self.timer.setInterval(100)
+        # self.timer.timeout.connect(self.update_plot)
+        # self.timer.start()
+
+    def update_plot(self):
+        if self._plot_ref is None:
+            plot_refs = self.canvas.axes.plot(self.xdata, self.ydata, 'b')
+            self._plot_ref = plot_refs[0]
+        else:
+            self._plot_ref.set_ydata(self.ydata)
+        self.canvas.draw()
 
 
 if __name__ == "__main__":
-    audio = Audio()
-    audio.from_wav("../tests/audios/test.wav")
-    dense = 1e-100
-    timeline = np.linspace(0, len(audio.audio_segment) / audio.rate, num=len(audio.audio_segment * dense))
-    plt.figure(1)
-    plt.title("Signal wave..")
-    plt.plot(timeline, audio.audio_segment)
-    plt.show()
+    app = QtWidgets.QApplication(sys.argv)
+    w = MainWindow()
+    app.exec_()
