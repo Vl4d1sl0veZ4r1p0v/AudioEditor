@@ -55,8 +55,9 @@
     <addaction name="separator"/>
     <addaction name="action_Open"/>
     <addaction name="separator"/>
-    <addaction name="action_Exit"/>
     <addaction name="action_Save_2"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
