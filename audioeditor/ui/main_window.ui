@@ -13,31 +13,7 @@
   <property name="windowTitle">
    <string>AudioEditor</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <widget class="QGraphicsView" name="graphicsView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>781</width>
-      <height>131</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>510</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
-  </widget>
+  <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -63,13 +39,16 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="actionS_wap"/>
     <addaction name="action_Delete"/>
+    <addaction name="separator"/>
+    <addaction name="actionChange_Pitc_h"/>
     <addaction name="actionChange_Volume"/>
     <addaction name="actionChange_S_peed"/>
+    <addaction name="separator"/>
     <addaction name="actionFade_In"/>
     <addaction name="actionFade_Out"/>
-    <addaction name="actionChange_Pitc_h"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -82,6 +61,17 @@
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="action_New">
    <property name="text">
     <string>&amp;New</string>
