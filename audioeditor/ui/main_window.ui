@@ -71,10 +71,24 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionS_wap"/>
+   <addaction name="action_Delete"/>
+   <addaction name="separator"/>
+   <addaction name="actionChange_Pitc_h"/>
+   <addaction name="actionChange_Volume"/>
+   <addaction name="actionChange_S_peed"/>
+   <addaction name="separator"/>
+   <addaction name="actionFade_In"/>
+   <addaction name="actionFade_Out"/>
+   <addaction name="separator"/>
+   <addaction name="actionPlay"/>
   </widget>
   <action name="action_New">
    <property name="text">
     <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
    </property>
   </action>
   <action name="action_Open">
@@ -140,6 +154,11 @@
   <action name="actionChange_Pitc_h">
    <property name="text">
     <string>Change Pitc&amp;h</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
    </property>
   </action>
  </widget>
