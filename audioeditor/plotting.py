@@ -11,7 +11,9 @@ matplotlib.use('Qt5Agg')
 
 from PyQt5 import QtCore, QtWidgets
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
+)
 from matplotlib.figure import Figure
 
 
@@ -29,7 +31,6 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
-        self.setCentralWidget(self.canvas)
 
         audio = Audio()
         audio.from_wav("../tests/audios/test.wav")
@@ -38,6 +39,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ydata = audio.audio_segment
         self._plot_ref = None
         self.update_plot()
+
+        toolbar = NavigationToolbar(self.canvas, self)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(toolbar)
+        layout.addWidget(self.canvas)
+
+        widget = QtWidgets.QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
 
         self.show()
 
