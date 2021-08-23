@@ -28,16 +28,12 @@ class MplCanvas(FigureCanvas):
         super(MplCanvas, self).__init__(fig)
 
 
-def onclick(event):
-    print(event.xdata, event.ydata)
-
-
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
-
+        self.coordinates = []
         audio = Audio()
         audio.from_wav("../tests/audios/test.wav")
         self.dense = 1e-100
@@ -71,7 +67,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.action_Exit.triggered.connect(self.close)
         self.action_About.triggered.connect(self.about)
         self.actionS_wap.triggered.connect(self.swap)
-        self.cid = self.canvas.mpl_connect('button_press_event', onclick)
 
     def about(self):
         QMessageBox.about(
@@ -84,18 +79,27 @@ class Window(QMainWindow, Ui_MainWindow):
             <p>- Matplotlib</p>"""
         )
 
-    def swap(self):
+    def onclick(self, event):
+        self.coordinates.append(event.xdata)
+        self.canvas.axes.axvline(x=event.xdata)
+        self.update_plot()
 
-        dialog = Swap(self)
-        dialog.exec()
+    def swap(self):
+        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick)
+        if len(self.coordinates) == 4:
+            dialog = Swap(self, self.coordinates)
+            dialog.exec()
+            self.coordinates = []
 
 
 class Swap(QDialog, Ui_Dialog):
-    def __init__(self, parent=None):
+    def __init__(self, coordinates, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.label_3.setText("label 3")
-
+        self.label_3.setText(coordinates[0])
+        self.label_4.setText(coordinates[1])
+        self.label_6.setText(coordinates[2])
+        self.label_8.setText(coordinates[3])
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
