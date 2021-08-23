@@ -81,25 +81,27 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def onclick(self, event):
         self.coordinates.append(event.xdata)
-        self.canvas.axes.axvline(x=event.xdata)
+        self.canvas.axes.axvline(x=event.xdata, c='r')
         self.update_plot()
-
-    def swap(self):
-        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick)
         if len(self.coordinates) == 4:
-            dialog = Swap(self, self.coordinates)
+            dialog = Swap(self)
             dialog.exec()
             self.coordinates = []
 
+    def swap(self):
+        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick)
+
 
 class Swap(QDialog, Ui_Dialog):
-    def __init__(self, coordinates, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.label_3.setText(coordinates[0])
-        self.label_4.setText(coordinates[1])
-        self.label_6.setText(coordinates[2])
-        self.label_8.setText(coordinates[3])
+        coordinates = parent.coordinates
+        self.label_3.setText(str(coordinates[0]))
+        self.label_4.setText(str(coordinates[1]))
+        self.label_6.setText(str(coordinates[2]))
+        self.label_8.setText(str(coordinates[3]))
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
