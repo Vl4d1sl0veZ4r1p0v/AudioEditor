@@ -1,28 +1,23 @@
 import sys
-
-from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox
-)
-# from PyQt5.uic import loadUi
-
-from main_window import Ui_MainWindow
-import random
-import sys
-
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from core import Audio
-
-matplotlib.use('Qt5Agg')
-
-from PyQt5 import QtCore, QtWidgets
-
+from PyQt5.QtWidgets import (
+    QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
+    QLabel
+)
+# from PyQt5.uic import loadUi
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
 )
 from matplotlib.figure import Figure
+
+from main_window import Ui_MainWindow
+from swap_dialog import Ui_Dialog
+from core import Audio
+
+matplotlib.use('Qt5Agg')
 
 
 class MplCanvas(FigureCanvas):
@@ -31,6 +26,10 @@ class MplCanvas(FigureCanvas):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         super(MplCanvas, self).__init__(fig)
+
+
+def onclick(event):
+    print(event.xdata, event.ydata)
 
 
 class Window(QMainWindow, Ui_MainWindow):
@@ -49,20 +48,16 @@ class Window(QMainWindow, Ui_MainWindow):
 
         toolbar = NavigationToolbar(self.canvas, self)
 
-        layout = QtWidgets.QVBoxLayout()
+        layout = QVBoxLayout()
         layout.addWidget(toolbar)
         layout.addWidget(self.canvas)
 
-        widget = QtWidgets.QWidget()
+        widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
         self.show()
         self.connectSignalsSlots()
-
-    def connectSignalsSlots(self):
-        self.action_Exit.triggered.connect(self.close)
-        self.action_About.triggered.connect(self.about)
 
     def update_plot(self):
         if self._plot_ref is None:
@@ -71,6 +66,12 @@ class Window(QMainWindow, Ui_MainWindow):
         else:
             self._plot_ref.set_ydata(self.ydata)
         self.canvas.draw()
+
+    def connectSignalsSlots(self):
+        self.action_Exit.triggered.connect(self.close)
+        self.action_About.triggered.connect(self.about)
+        self.actionS_wap.triggered.connect(self.swap)
+        self.cid = self.canvas.mpl_connect('button_press_event', onclick)
 
     def about(self):
         QMessageBox.about(
@@ -82,6 +83,18 @@ class Window(QMainWindow, Ui_MainWindow):
             <p>- PyDub</p>
             <p>- Matplotlib</p>"""
         )
+
+    def swap(self):
+
+        dialog = Swap(self)
+        dialog.exec()
+
+
+class Swap(QDialog, Ui_Dialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.label_3.setText("label 3")
 
 
 if __name__ == "__main__":
