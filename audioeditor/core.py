@@ -76,10 +76,14 @@ class Audio:
         return self.audio_segment[start:end:step]
 
     def delete(self, start, end, step=1):
-        self.audio_segment = np.delete(
-            self.audio_segment,
-            slice(start, end, step),
-            0)
+        start, end = min(start, end), max(start, end)
+        tmp1 = np.array(self.audio_segment[:start])
+        tmp2 = np.array(self.audio_segment[start:end])
+        tmp3 = np.array(self.audio_segment[end:])
+        self.audio_segment = np.concatenate([
+            tmp1,
+            tmp3
+        ])
 
     def change_volume(self, value):
         audio_from_segment = AudioSegment(
