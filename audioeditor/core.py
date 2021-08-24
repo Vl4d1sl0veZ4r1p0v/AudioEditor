@@ -42,11 +42,32 @@ class Audio:
         file_handle = self.audio_segment.export(file_name, format="mp3")
         return file_handle
 
+    @staticmethod
+    def is_intersect(first_start, first_end, second_start, second_end):
+        first_start, first_end = min(first_start, first_end), max(first_start, first_end)
+        second_start, second_end = min(second_start, second_end), max(second_start, second_end)
+        left = max(first_start, second_start)
+        right = min(first_end, second_end)
+        if right < left:
+            return False
+        return True
+
     def swap(self, first_start, first_end, second_start, second_end):
-        tmp1 = np.array(self.audio_segment[first_start:first_end])
-        tmp2 = self.audio_segment[second_start:second_end]
-        self.audio_segment[first_start:first_end] = tmp2
-        self.audio_segment[second_start:second_end] = tmp1
+        if self.is_intersect(first_start, first_end, second_start, second_end):
+            raise Exception("Segments must not intersect")
+        points = sorted([first_start, first_end, second_start, second_end])
+        tmp1 = np.array(self.audio_segment[:points[0]])
+        tmp2 = np.array(self.audio_segment[points[0]:points[1]])
+        tmp3 = np.array(self.audio_segment[points[1]:points[2]])
+        tmp4 = np.array(self.audio_segment[points[2]:points[3]])
+        tmp5 = np.array(self.audio_segment[points[3]:])
+        self.audio_segment = np.concatenate([
+            tmp1,
+            tmp4,
+            tmp3,
+            tmp2,
+            tmp5
+        ])
 
     def at(self, index):
         return self.audio_segment[index]

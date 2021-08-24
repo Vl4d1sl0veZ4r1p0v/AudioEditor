@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+from math import floor
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
     QLabel
@@ -34,11 +35,11 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
         self.coordinates = []
-        audio = Audio()
-        audio.from_wav("../tests/audios/test.wav")
+        self.audio = Audio()
+        self.audio.from_wav("../tests/audios/test.wav")
         self.dense = 1e-100
-        self.xdata = np.linspace(0, len(audio.audio_segment) / audio.rate, num=len(audio.audio_segment * self.dense))
-        self.ydata = audio.audio_segment
+        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate, num=len(self.audio.audio_segment * self.dense))
+        self.ydata = self.audio.audio_segment
         self._plot_ref = None
         self.update_plot()
 
@@ -56,6 +57,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.connectSignalsSlots()
 
     def update_plot(self):
+        self.ydata = self.audio.audio_segment
         if self._plot_ref is None:
             plot_refs = self.canvas.axes.plot(self.xdata, self.ydata, 'b')
             self._plot_ref = plot_refs[0]
@@ -83,24 +85,39 @@ class Window(QMainWindow, Ui_MainWindow):
         self.coordinates.append(event.xdata)
         self.canvas.axes.axvline(x=event.xdata, c='r')
         self.update_plot()
+
+
+
+    def swap(self):
+        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick)
         if len(self.coordinates) == 4:
             dialog = Swap(self)
             dialog.exec()
             self.coordinates = []
-
-    def swap(self):
-        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick)
+            self.canvas.mpl_disconnect(self.swap_canvas_onclick)
+            self.canvas.axes.clear()
 
 
 class Swap(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        coordinates = parent.coordinates
-        self.label_3.setText(str(coordinates[0]))
-        self.label_4.setText(str(coordinates[1]))
-        self.label_6.setText(str(coordinates[2]))
-        self.label_8.setText(str(coordinates[3]))
+        self.parent = parent
+        self.label_3.setText(str(parent.coordinates[0]))
+        self.label_4.setText(str(parent.coordinates[1]))
+        self.label_6.setText(str(parent.coordinates[2]))
+        self.label_8.setText(str(parent.coordinates[3]))
+        self.buttonBox.accepted.connect(self.apply)
+
+    def apply(self):
+        self.parent.audio.swap(
+            floor(self.parent.audio.rate * self.parent.coordinates[0]),
+            floor(self.parent.audio.rate * self.parent.coordinates[1]),
+            floor(self.parent.audio.rate * self.parent.coordinates[2]),
+            floor(self.parent.audio.rate * self.parent.coordinates[3])
+        )
+
+        self.parent.update_plot()
 
 
 if __name__ == "__main__":
