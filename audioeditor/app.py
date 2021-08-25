@@ -79,6 +79,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.actionChange_Volume.triggered.connect(self.change_volume)
         self.actionChange_S_peed.triggered.connect(self.change_speed)
         self.actionFade_In.triggered.connect(self.fade_in)
+        self.actionFade_Out.triggered.connect(self.fade_out)
 
     def about(self):
         QMessageBox.about(
@@ -156,6 +157,21 @@ class Window(QMainWindow, Ui_MainWindow):
     def fade_in(self):
         self.fade_in_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_fade_in)
 
+    def onclick_fade_out(self, event):
+        self.coordinates.append(event.xdata)
+        self.canvas.axes.axvline(x=event.xdata, c='r')
+        if len(self.coordinates) == 1:
+            dialog = FadeOut(self)
+            dialog.exec()
+            self.coordinates = []
+            self.canvas.mpl_disconnect(self.fade_out_onclick)
+            self.canvas.axes.clear()
+            self._plot_ref = None
+        self.update_plot()
+
+    def fade_out(self):
+        self.fade_out_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_fade_out)
+
 
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):
@@ -229,6 +245,21 @@ class FadeIn(QDialog, Fade_In_Dialog):
 
     def apply(self):
         self.parent.audio = self.parent.audio.get_fade_in(
+            floor(1000 * self.parent.coordinates[0])
+        )
+        self.parent.update_plot()
+
+
+class FadeOut(QDialog, Fade_In_Dialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.parent = parent
+        self.label_6.setText(str(parent.coordinates[0]))
+        self.buttonBox.accepted.connect(self.apply)
+
+    def apply(self):
+        self.parent.audio = self.parent.audio.get_fade_out(
             floor(1000 * self.parent.coordinates[0])
         )
         self.parent.update_plot()
