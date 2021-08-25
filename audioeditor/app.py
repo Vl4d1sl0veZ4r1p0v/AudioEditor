@@ -1,23 +1,21 @@
 import sys
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-
 from math import floor
+
+import matplotlib
+import numpy as np
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
-    QLabel
+    QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget
 )
-# from PyQt5.uic import loadUi
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
 )
 from matplotlib.figure import Figure
 
+from change_pitch import Ui_Dialog as Change_Pitch_Dialog
+from core import Audio
+from delete import Ui_Dialog as Delete_dialog
 from main_window import Ui_MainWindow
 from swap_dialog import Ui_Dialog as Swap_Dialog
-from delete import Ui_Dialog as Delete_dialog
-from core import Audio
 
 matplotlib.use('Qt5Agg')
 
@@ -60,6 +58,8 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def update_plot(self):
         self.ydata = self.audio.audio_segment
+        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate,
+                                 num=len(self.audio.audio_segment * self.dense))
         if self._plot_ref is None:
             plot_refs = self.canvas.axes.plot(self.xdata, self.ydata, 'b')
             self._plot_ref = plot_refs[0]
@@ -72,6 +72,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.action_About.triggered.connect(self.about)
         self.actionS_wap.triggered.connect(self.swap)
         self.action_Delete.triggered.connect(self.delete)
+        self.actionChange_Pitc_h.triggered.connect(self.change_pitch)
 
     def about(self):
         QMessageBox.about(
@@ -114,6 +115,12 @@ class Window(QMainWindow, Ui_MainWindow):
     def delete(self):
         self.delete_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_delete)
 
+    def change_pitch(self):
+        dialog = ChangePitch(self)
+        dialog.exec()
+        value = dialog.spinBox.value()
+        self.audio = self.audio.change_pitch(value)
+
 
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):
@@ -150,6 +157,17 @@ class Delete(QDialog, Delete_dialog):
             floor(self.parent.audio.rate * self.parent.coordinates[0]),
             floor(self.parent.audio.rate * self.parent.coordinates[1]),
         )
+        self.parent.update_plot()
+
+
+class ChangePitch(QDialog, Change_Pitch_Dialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.parent = parent
+        self.buttonBox.accepted.connect(self.apply)
+
+    def apply(self):
         self.parent.update_plot()
 
 

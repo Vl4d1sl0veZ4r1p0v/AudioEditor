@@ -75,10 +75,9 @@ class Audio:
     def get_slice(self, start, end, step=1):
         return self.audio_segment[start:end:step]
 
-    def delete(self, start, end, step=1):
+    def delete(self, start, end):
         start, end = min(start, end), max(start, end)
         tmp1 = np.array(self.audio_segment[:start])
-        tmp2 = np.array(self.audio_segment[start:end])
         tmp3 = np.array(self.audio_segment[end:])
         self.audio_segment = np.concatenate([
             tmp1,
