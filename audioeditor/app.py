@@ -19,6 +19,7 @@ from swap_dialog import Ui_Dialog as Swap_Dialog
 from change_volume import Ui_Dialog as Change_Volume_Dialog
 from change_speed import Ui_Dialog as Change_Speed_Dialog
 from fade_in import Ui_Dialog as Fade_In_Dialog
+from play import Ui_Dialog as Play
 
 matplotlib.use('Qt5Agg')
 
@@ -80,6 +81,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.actionChange_S_peed.triggered.connect(self.change_speed)
         self.actionFade_In.triggered.connect(self.fade_in)
         self.actionFade_Out.triggered.connect(self.fade_out)
+        self.actionPlay.triggered.connect(self.play)
 
     def about(self):
         QMessageBox.about(
@@ -91,6 +93,10 @@ class Window(QMainWindow, Ui_MainWindow):
             <p>- PyDub</p>
             <p>- Matplotlib</p>"""
         )
+
+    def play(self):
+        dialog = Play(self)
+        dialog.exec()
 
     def onclick_swap(self, event):
         self.coordinates.append(event.xdata)
@@ -263,6 +269,12 @@ class FadeOut(QDialog, Fade_In_Dialog):
             floor(1000 * self.parent.coordinates[0])
         )
         self.parent.update_plot()
+
+class Play(QDialog, Play):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        parent.audio.play()
 
 
 if __name__ == "__main__":
