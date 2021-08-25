@@ -16,6 +16,7 @@ from core import Audio
 from delete import Ui_Dialog as Delete_dialog
 from main_window import Ui_MainWindow
 from swap_dialog import Ui_Dialog as Swap_Dialog
+from change_volume import Ui_Dialog as Change_Volume_Dialog
 
 matplotlib.use('Qt5Agg')
 
@@ -54,7 +55,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setCentralWidget(widget)
 
         self.show()
-        self.connectSignalsSlots()
+        self.connect_signals_slots()
 
     def update_plot(self):
         self.ydata = self.audio.audio_segment
@@ -67,12 +68,13 @@ class Window(QMainWindow, Ui_MainWindow):
             self._plot_ref.set_ydata(self.ydata)
         self.canvas.draw()
 
-    def connectSignalsSlots(self):
+    def connect_signals_slots(self):
         self.action_Exit.triggered.connect(self.close)
         self.action_About.triggered.connect(self.about)
         self.actionS_wap.triggered.connect(self.swap)
         self.action_Delete.triggered.connect(self.delete)
         self.actionChange_Pitc_h.triggered.connect(self.change_pitch)
+        self.actionChange_Volume.triggered.connect(self.change_volume)
 
     def about(self):
         QMessageBox.about(
@@ -121,6 +123,14 @@ class Window(QMainWindow, Ui_MainWindow):
         value = dialog.spinBox.value()
         self.audio = self.audio.change_pitch(value)
 
+    def change_volume(self):
+        dialog = ChangeVolume(self)
+        dialog.exec()
+        value = dialog.doubleSpinBox.value()
+        self.audio.change_volume(value)
+        self._plot_ref = None
+        self.update_plot()
+
 
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):
@@ -161,6 +171,16 @@ class Delete(QDialog, Delete_dialog):
 
 
 class ChangePitch(QDialog, Change_Pitch_Dialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.parent = parent
+        self.buttonBox.accepted.connect(self.apply)
+
+    def apply(self):
+        self.parent.update_plot()
+
+class ChangeVolume(QDialog, Change_Volume_Dialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
