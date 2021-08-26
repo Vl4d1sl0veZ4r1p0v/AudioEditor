@@ -76,6 +76,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.actionFade_Out.triggered.connect(self.fade_out)
         self.actionPlay.triggered.connect(self.play)
         self.action_Open.triggered.connect(self.open_file)
+        self.action_Save_2.triggered.connect(self.save_file)
+        self.action_Save.triggered.connect(self.save_file)
 
     def about(self):
         QMessageBox.about(
@@ -184,6 +186,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self._plot_ref = None
         self.update_plot()
 
+    def save_file(self):
+        filename = QFileDialog.getSaveFileName(self, 'Open file', '/home')[0]
+        self.audio.save_to_wav(filename)
 
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):

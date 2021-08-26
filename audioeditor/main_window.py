@@ -67,7 +67,6 @@ class Ui_MainWindow(object):
         self.actionChange_Pitc_h.setObjectName("actionChange_Pitc_h")
         self.actionPlay = QtWidgets.QAction(MainWindow)
         self.actionPlay.setObjectName("actionPlay")
-        self.menuFile.addAction(self.action_New)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.action_Open)
         self.menuFile.addSeparator()
