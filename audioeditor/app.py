@@ -4,7 +4,8 @@ from math import floor
 import matplotlib
 import numpy as np
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget
+    QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
+    QFileDialog
 )
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
@@ -38,15 +39,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
         self.coordinates = []
-        self.audio = Audio()
-        self.audio.from_wav("../tests/audios/test.wav")
-        self.dense = 1e-100
-        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate,
-                                 num=len(self.audio.audio_segment * self.dense))
-        self.ydata = self.audio.audio_segment
-        self._plot_ref = None
-        self.update_plot()
-
+        self.open_file()
         toolbar = NavigationToolbar(self.canvas, self)
 
         layout = QVBoxLayout()
@@ -82,6 +75,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.actionFade_In.triggered.connect(self.fade_in)
         self.actionFade_Out.triggered.connect(self.fade_out)
         self.actionPlay.triggered.connect(self.play)
+        self.action_Open.triggered.connect(self.open_file)
 
     def about(self):
         QMessageBox.about(
@@ -177,6 +171,18 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def fade_out(self):
         self.fade_out_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_fade_out)
+
+    def open_file(self):
+        self.audio = Audio()
+        filename = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+        self.audio.from_wav(filename)
+        self.dense = 1e-100
+        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate,
+                                 num=len(self.audio.audio_segment * self.dense))
+        self.ydata = self.audio.audio_segment
+        self.canvas.axes.clear()
+        self._plot_ref = None
+        self.update_plot()
 
 
 class Swap(QDialog, Swap_Dialog):
