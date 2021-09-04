@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import (
     QFileDialog
 )
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar
 )
 from matplotlib.figure import Figure
 
@@ -55,8 +56,11 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def update_plot(self):
         self.ydata = self.audio.audio_segment
-        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate,
-                                 num=len(self.audio.audio_segment * self.dense))
+        self.xdata = np.linspace(
+            0,
+            len(self.audio.audio_segment) / self.audio.rate,
+            num=len(self.audio.audio_segment * self.dense)
+        )
         if self._plot_ref is None:
             plot_refs = self.canvas.axes.plot(self.xdata, self.ydata, 'b')
             self._plot_ref = plot_refs[0]
@@ -107,7 +111,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.update_plot()
 
     def swap(self):
-        self.swap_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_swap)
+        self.swap_canvas_onclick = self.canvas.mpl_connect(
+            'button_press_event',
+            self.onclick_swap
+        )
 
     def onclick_delete(self, event):
         self.coordinates.append(event.xdata)
@@ -122,7 +129,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.update_plot()
 
     def delete(self):
-        self.delete_canvas_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_delete)
+        self.delete_canvas_onclick = self.canvas.mpl_connect(
+            'button_press_event',
+            self.onclick_delete
+        )
 
     def change_pitch(self):
         dialog = ChangePitch(self)
@@ -157,7 +167,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.update_plot()
 
     def fade_in(self):
-        self.fade_in_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_fade_in)
+        self.fade_in_onclick = self.canvas.mpl_connect(
+            'button_press_event',
+            self.onclick_fade_in
+        )
 
     def onclick_fade_out(self, event):
         self.coordinates.append(event.xdata)
@@ -172,15 +185,21 @@ class Window(QMainWindow, Ui_MainWindow):
         self.update_plot()
 
     def fade_out(self):
-        self.fade_out_onclick = self.canvas.mpl_connect('button_press_event', self.onclick_fade_out)
+        self.fade_out_onclick = self.canvas.mpl_connect(
+            'button_press_event',
+            self.onclick_fade_out
+        )
 
     def open_file(self):
         self.audio = Audio()
         filename = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
         self.audio.from_wav(filename)
         self.dense = 1e-100
-        self.xdata = np.linspace(0, len(self.audio.audio_segment) / self.audio.rate,
-                                 num=len(self.audio.audio_segment * self.dense))
+        self.xdata = np.linspace(
+            0,
+            len(self.audio.audio_segment) / self.audio.rate,
+            num=len(self.audio.audio_segment * self.dense)
+        )
         self.ydata = self.audio.audio_segment
         self.canvas.axes.clear()
         self._plot_ref = None
@@ -189,6 +208,7 @@ class Window(QMainWindow, Ui_MainWindow):
     def save_file(self):
         filename = QFileDialog.getSaveFileName(self, 'Open file', '/home')[0]
         self.audio.save_to_wav(filename)
+
 
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):
@@ -280,6 +300,7 @@ class FadeOut(QDialog, Fade_In_Dialog):
             floor(1000 * self.parent.coordinates[0])
         )
         self.parent.update_plot()
+
 
 class Play(QDialog, Play):
     def __init__(self, parent=None):

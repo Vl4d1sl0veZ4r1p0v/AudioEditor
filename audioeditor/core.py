@@ -43,12 +43,12 @@ class Audio:
         return file_handle
 
     @staticmethod
-    def is_intersect(first_start, first_end, second_start, second_end):
-        first_start, first_end = min(first_start, first_end), max(first_start, first_end)
-        second_start, second_end = min(second_start, second_end), max(second_start, second_end)
-        left = max(first_start, second_start)
-        right = min(first_end, second_end)
-        if right < left:
+    def is_intersect(x1, x2, x3, x4):
+        x1, x2 = min(x1, x2), max(x1, x2)
+        x3, x4 = min(x3, x4), max(x3, x4)
+        left = max(x1, x3)
+        right = min(x2, x4)
+        if right <= left:
             return False
         return True
 

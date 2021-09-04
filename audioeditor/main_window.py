@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'audioeditor/ui/main_window.ui'
+# Form implementation generated from reading ui file
+# 'audioeditor/ui/main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -36,7 +37,10 @@ class Ui_MainWindow(object):
         MainWindow.addToolBar(QtCore.Qt.LeftToolBarArea, self.toolBar)
         self.action_New = QtWidgets.QAction(MainWindow)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("audioeditor/ui/resources/file-new.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap("audioeditor/ui/resources/file-new.png"),
+            QtGui.QIcon.Normal, QtGui.QIcon.Off
+        )
         self.action_New.setIcon(icon)
         self.action_New.setObjectName("action_New")
         self.action_Open = QtWidgets.QAction(MainWindow)
@@ -113,7 +117,9 @@ class Ui_MainWindow(object):
         self.action_New.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.action_Open.setText(_translate("MainWindow", "&Open"))
         self.action_Open.setShortcut(_translate("MainWindow", "Ctrl+O"))
-        self.actionOpen_Recent.setText(_translate("MainWindow", "Open &Recent"))
+        self.actionOpen_Recent.setText(
+            _translate("MainWindow", "Open &Recent")
+        )
         self.action_Save.setText(_translate("MainWindow", "&Save"))
         self.action_Save.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.action_Exit.setText(_translate("MainWindow", "&Exit"))
@@ -122,9 +128,15 @@ class Ui_MainWindow(object):
         self.action_Save_2.setText(_translate("MainWindow", "&Save"))
         self.actionS_wap.setText(_translate("MainWindow", "S&wap"))
         self.action_Delete.setText(_translate("MainWindow", "&Delete"))
-        self.actionChange_Volume.setText(_translate("MainWindow", "Change &Volume"))
-        self.actionChange_S_peed.setText(_translate("MainWindow", "Change S&peed"))
+        self.actionChange_Volume.setText(
+            _translate("MainWindow", "Change &Volume")
+        )
+        self.actionChange_S_peed.setText(
+            _translate("MainWindow", "Change S&peed")
+        )
         self.actionFade_In.setText(_translate("MainWindow", "Fade &In"))
         self.actionFade_Out.setText(_translate("MainWindow", "Fade &Out"))
-        self.actionChange_Pitc_h.setText(_translate("MainWindow", "Change Pitc&h"))
+        self.actionChange_Pitc_h.setText(
+            _translate("MainWindow", "Change Pitc&h")
+        )
         self.actionPlay.setText(_translate("MainWindow", "Play"))

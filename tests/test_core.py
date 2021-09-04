@@ -1,4 +1,5 @@
 import pytest
+from math import sin, cos, pi
 import numpy as np
 from audioeditor.core import Audio
 
@@ -77,3 +78,36 @@ def test_change_speed():
     expected_file_name = "tests/audios/test_changed_speed.wav"
     expected_audio.from_wav(expected_file_name)
     assert expected_audio.rate == current_audio.rate
+
+
+def test_intersect():
+    assert Audio.is_intersect(1, 5, 2, 10)
+
+
+def test_not_intersect():
+    assert Audio.is_intersect(1, 5, 6, 10) is False
+
+
+def test_at():
+    tmp = Audio()
+    tmp.audio_segment = np.arange(10)
+    assert tmp.at(0) == 0
+
+
+def test_get_slice():
+    tmp = Audio()
+    tmp.audio_segment = np.arange(10)
+    result = tmp.get_slice(0, 3)
+    assert (result-np.arange(3)).all
+
+
+def test_delete():
+    tmp = Audio()
+    tmp.audio_segment = np.arange(10)
+    tmp.delete(0, 3)
+    assert (tmp.audio_segment-np.arange(3, 10)).all
+
+
+if __name__ == "__main__":
+    print("hui")
+    test_at()
