@@ -240,7 +240,6 @@ class Window(QMainWindow, Ui_MainWindow):
         join_audiofile(self.audio_parts, filename)
 
 
-
 class Swap(QDialog, Swap_Dialog):
     def __init__(self, parent=None):
         super().__init__(parent)
