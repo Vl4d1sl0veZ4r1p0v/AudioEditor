@@ -3,7 +3,7 @@ from math import floor
 
 import matplotlib
 import numpy as np
-from audioeditor.utils import split_audiofile
+from audioeditor.utils import split_audiofile, join_audiofile
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
     QFileDialog, QPushButton
@@ -200,10 +200,12 @@ class Window(QMainWindow, Ui_MainWindow):
     def next_audio(self):
         self.current_audiofile_pos = min(self.current_audiofile_pos + 1,
                                          len(self.audio_parts) - 1)
+        self.save_part()
         self.open_file()
 
     def prev_audio(self):
         self.current_audiofile_pos = max(self.current_audiofile_pos - 1, 0)
+        self.save_part()
         self.open_file()
 
     def open_file(self):
@@ -228,9 +230,15 @@ class Window(QMainWindow, Ui_MainWindow):
         self._plot_ref = None
         self.update_plot()
 
-    def save_file(self):
-        filename = QFileDialog.getSaveFileName(self, 'Open file', '/home')[0]
+    def save_part(self):
+        filename = self.audio_parts[self.current_audiofile_pos]
         self.audio.save_to_wav(filename)
+
+    def save_file(self):
+        self.save_part()
+        filename = QFileDialog.getSaveFileName(self, 'Open file', '/home')[0]
+        join_audiofile(self.audio_parts, filename)
+
 
 
 class Swap(QDialog, Swap_Dialog):
