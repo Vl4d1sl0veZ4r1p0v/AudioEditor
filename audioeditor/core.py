@@ -6,9 +6,9 @@ from pydub.playback import play
 
 class Audio:
 
-    def __init__(self):
+    def __init__(self, rate=44100):
         self.audio_segment = None
-        self.rate = None
+        self.rate = rate
 
     def from_wav(self, file_name):
         self.audio_segment = AudioSegment.from_file(file_name, format="wav")

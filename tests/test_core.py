@@ -1,6 +1,6 @@
-import pytest
-from math import sin, cos, pi
 import numpy as np
+from pydub import AudioSegment
+
 from audioeditor.core import Audio
 
 basic_filename = "tests/audios/test.wav"
@@ -101,8 +101,6 @@ def test_get_slice():
     assert (result-np.arange(3)).all
 
 
-
-
 def test_delete():
     tmp = Audio()
     tmp.audio_segment = np.arange(10)
@@ -110,6 +108,42 @@ def test_delete():
     assert (tmp.audio_segment-np.arange(3, 10)).all
 
 
+# def test_change_volume():
+#     tmp = Audio()
+#     tmp.audio_segment = np.arange(10)
+#     audio_from_segment = AudioSegment(
+#         tmp.audio_segment.tobytes(),
+#         frame_rate=tmp.rate,
+#         sample_width=1,
+#         channels=1
+#     )
+#     audio_from_segment = audio_from_segment + 1
+#     tmp.change_volume(1)
+#     assert tmp.audio_segment == audio_from_segment.get_array_of_samples()
+
+
+def test_change_speed():
+    tmp = Audio(rate=44100)
+    tmp.audio_segment = np.arange(10)
+    tmp.change_speed(2.0)
+    assert tmp.rate == 44100 * 2.0
+
+    def get_fade_in(self, duration):
+        self_audio = AudioSegment(
+            data=self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        self_audio.fade_in(
+            duration=duration
+        )
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
+
+
 if __name__ == "__main__":
-    print("hui")
-    test_at()
+    pass

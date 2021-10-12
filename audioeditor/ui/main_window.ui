@@ -48,6 +48,7 @@
     <addaction name="separator"/>
     <addaction name="actionFade_In"/>
     <addaction name="actionFade_Out"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -81,6 +82,9 @@
    <addaction name="actionFade_Out"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
+   <addaction name="separator"/>
+   <addaction name="action_3"/>
+   <addaction name="action_2"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -171,6 +175,16 @@
   <action name="actionPlay">
    <property name="text">
     <string>Play</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>-&gt;</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>&lt;-</string>
    </property>
   </action>
  </widget>

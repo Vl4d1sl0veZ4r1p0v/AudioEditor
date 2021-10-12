@@ -3,9 +3,10 @@ from math import floor
 
 import matplotlib
 import numpy as np
+from audioeditor.utils import split_audiofile
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox, QVBoxLayout, QWidget,
-    QFileDialog
+    QFileDialog, QPushButton
 )
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas,
@@ -40,6 +41,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
         self.coordinates = []
+        self.filename = None
+        self.audio_parts = []
+        self.current_audiofile = None
+        self.current_audiofile_pos = 0
         self.open_file()
         toolbar = NavigationToolbar(self.canvas, self)
 
@@ -82,6 +87,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.action_Open.triggered.connect(self.open_file)
         self.action_Save_2.triggered.connect(self.save_file)
         self.action_Save.triggered.connect(self.save_file)
+        self.action_3.triggered.connect(self.prev_audio)
+        self.action_2.triggered.connect(self.next_audio)
 
     def about(self):
         QMessageBox.about(
@@ -190,10 +197,26 @@ class Window(QMainWindow, Ui_MainWindow):
             self.onclick_fade_out
         )
 
+    def next_audio(self):
+        self.current_audiofile_pos = min(self.current_audiofile_pos + 1,
+                                         len(self.audio_parts) - 1)
+        self.open_file()
+
+    def prev_audio(self):
+        self.current_audiofile_pos = max(self.current_audiofile_pos - 1, 0)
+        self.open_file()
+
     def open_file(self):
+        if self.filename is None:
+            self.filename = QFileDialog.getOpenFileName(
+                self,
+                'Open file',
+                '/home'
+            )[0]
+            self.audio_parts = split_audiofile(self.filename)
+            self.current_audiofile_pos = 0
         self.audio = Audio()
-        filename = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
-        self.audio.from_wav(filename)
+        self.audio.from_wav(self.audio_parts[self.current_audiofile_pos])
         self.dense = 1e-100
         self.xdata = np.linspace(
             0,
