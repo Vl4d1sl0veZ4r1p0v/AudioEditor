@@ -1,216 +1,181 @@
 import numpy as np
-import subprocess
-import warnings
-from copy import deepcopy
-from wave import open as open_wave
+
+from pydub import AudioSegment
+from pydub.playback import play
 
 
-class Signal:
+class Audio:
 
-    def __init__(self):
-        pass
+    def __init__(self, rate=44100):
+        self.audio_segment = None
+        self.rate = rate
 
-    def rearrange_parts(self):
-        return None
+    def from_wav(self, file_name):
+        self.audio_segment = AudioSegment.from_file(file_name, format="wav")
+        self.rate = self.audio_segment.frame_rate
+        self.audio_segment = np.array(
+            self.audio_segment.get_array_of_samples())
 
-    def delete_part(self):
-        return None
+    def from_mp3(self, file_name):
+        self.audio_segment = AudioSegment.from_file(file_name, format="mp3")
+        self.rate = self.audio_segment.frame_rate
+        self.audio_segment = np.array(
+            self.audio_segment.get_array_of_samples())
 
-    def insert_part(self):
-        return None
-
-    def change_the_volume_on_a_segment(self):
-        return None
-
-    def smooth_appearance(self):
-        return None
-
-    def smooth_fade_out(self):
-        return None
-
-
-def normalize(ys, amp=1.0):
-    high, low = abs(max(ys)), abs(min(ys))
-    return amp * ys / max(high, low)
-
-
-def quantize(ys, bound, dtype):
-    if max(ys) > 1 or min(ys) < -1:
-        warnings.warn(
-            "Warning: normalizing before quantizing."
+    def save_to_wav(self, file_name):
+        self.audio_segment = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
         )
-        ys = normalize(ys)
-    zs = (ys * bound).astype(dtype)
-    return zs
+        file_handle = self.audio_segment.export(file_name, format="wav")
+        return file_handle
 
+    def save_to_mp3(self, file_name):
+        self.audio_segment = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate * 20,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        file_handle = self.audio_segment.export(file_name, format="mp3")
+        return file_handle
 
-class Signal:
+    @staticmethod
+    def is_intersect(x1, x2, x3, x4):
+        x1, x2 = min(x1, x2), max(x1, x2)
+        x3, x4 = min(x3, x4), max(x3, x4)
+        left = max(x1, x3)
+        right = min(x2, x4)
+        if right <= left:
+            return False
+        return True
 
-    def __add__(self, other):
-        if other == 0:
-            return self
-        return
+    def swap(self, first_start, first_end, second_start, second_end):
+        if self.is_intersect(first_start, first_end, second_start, second_end):
+            raise Exception("Segments must not intersect")
+        points = sorted([first_start, first_end, second_start, second_end])
+        tmp1 = np.array(self.audio_segment[:points[0]])
+        tmp2 = np.array(self.audio_segment[points[0]:points[1]])
+        tmp3 = np.array(self.audio_segment[points[1]:points[2]])
+        tmp4 = np.array(self.audio_segment[points[2]:points[3]])
+        tmp5 = np.array(self.audio_segment[points[3]:])
+        self.audio_segment = np.concatenate([
+            tmp1,
+            tmp4,
+            tmp3,
+            tmp2,
+            tmp5
+        ])
 
+    def at(self, index):
+        return self.audio_segment[index]
 
-class SilentSignal(Signal):
+    def get_slice(self, start, end, step=1):
+        return self.audio_segment[start:end:step]
 
-    def evaluate(self, ts):
-        return np.zeros(len(ts))
+    def delete(self, start, end):
+        start, end = min(start, end), max(start, end)
+        tmp1 = np.array(self.audio_segment[:start])
+        tmp3 = np.array(self.audio_segment[end:])
+        self.audio_segment = np.concatenate([
+            tmp1,
+            tmp3
+        ])
 
+    def change_volume(self, value):
+        audio_from_segment = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        audio_from_segment = audio_from_segment + value
+        self.audio_segment = np.array(
+            audio_from_segment.get_array_of_samples())
 
-def rest(duration):
-    signal = SilentSignal()
-    wave = signal.make_wave(duration)
-    return wave
-
-
-class WavFileWriter:
-
-    def __init__(self, filename: str, framerate=11025):
-        self.filename = filename
-        self.framerate = framerate
-        self.n_channels = 1
-        self.sample_width = 2
-
-        self.bits = self.sample_width * 8
-        self.bound = 2 ** (self.bits - 1) - 1
-
-        self.fmt = "h"
-        self.dtype = np.int16
-
-        self.fp = open_wave(self.filename, "w")
-        self.fp.setnchammels(self.n_channels)
-        self.fp.setsampwidth(self.sampwidth)
-        self.fp.setframerate(self.framerate)
-
-    def write(self, wave):
-        zs = wave.quantize(self.bound, self.dtype)
-        self.fp.writeframes(zs.tostring())
-
-    def close(self, duration=0):
-        if duration:
-            self.write(rest(duration))
-        self.fp.close()
-
-
-def play_wave(filename: str, player="aplay"):
-    cmd = f"{player} {filename}"
-    popen = subprocess.Popen(cmd, shell=True)
-    popen.communicate()
-
-
-def find_index(x, xs):
-    n = len(xs)
-    start = xs[0]
-    end = xs[-1]
-    i = round((n - 1) * (x - start) / (end - start))
-    return int(i)
-
-
-def read_wave(filename: str) -> np.array:
-    fp = open_wave(filename, "r")
-
-    n_channels = fp.getnchannels()
-    n_frames = fp.getnframes()
-    samp_width = fp.getsampwidth()
-    framerate = fp.getframerate()
-
-    z_str = fp.readframes(n_frames)
-
-    fp.close()
-
-    dtype_map = {1: np.int8, 2: np.int16, 3: "special", 4: np.int32}
-    if samp_width not in dtype_map:
-        raise ValueError(f"Unknown {samp_width} samp_width")
-    if samp_width == 3:
-        xs = np.fromstring(z_str, dtype=np.int8).astype(np.int32)
-        ys = (xs[2::3] * 256 + xs[1::3]) * 256 + xs[0::3]
-    else:
-        ys = np.fromstring(z_str, dtype=dtype_map[samp_width])
-
-    if n_channels == 2:
-        ys = ys[::2]
-
-    wave = Wave(ys, framerate=framerate)
-    wave.normalize()
-    return wave
-
-
-class Wave:
-
-    def __init__(self, ys, ts=None, framerate=None):
-        self.ys = np.asanyarray(ys)
-        self.framerate = framerate if framerate is not None else 11025
-
-        if ts is None:
-            self.ts = np.arange(len(ys)) / self.framerate
-        else:
-            self.ts = np.asanyarray(ts)
-
-    def copy(self):
-        return deepcopy(self)
-
-    def __len__(self):
-        return len(self.ys)
-
-    @property
-    def start(self):
-        return self.ts[0]
-
-    @property
-    def end(self):
-        return self.ts[-1]
-
-    @property
-    def duration(self):
-        return len(self.ys) / self.framerate
-
-    def quantize(self, bound, dtype):
-        return quantize(self.ys, bound, dtype)
+    def change_speed(self, speed=1.0):
+        self.rate *= speed
 
     def __add__(self, other):
-        if other == 0:
-            return self
-        assert self.framerate == other.framerate
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        other_audio = AudioSegment(
+            other.audio_segment.tobytes(),
+            frame_rate=other.rate,
+            sample_width=other.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        self_audio = self_audio + other_audio
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
 
-        start = min(self.start, other.start)
-        end = max(self.end, other.end)
-        n = int(round((end - start) * self.framerate)) + 1
-        ys = np.zeros(n)
-        ts = start + np.arange(n) / self.framerate
+    def get_fade_in(self, duration):
+        self_audio = AudioSegment(
+            data=self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        self_audio.fade_in(
+            duration=duration
+        )
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
 
-        def add_ys(wave):
-            i = find_index(wave.start, ts)
+    def get_fade_out(self, duration):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        self_audio.fade_out(
+            duration=duration
+        )
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
 
-            diff = ts[i] - wave.start
-            dt = 1 / wave.framerate
-            if diff / dt > 0.1:
-                warnings.warn(
-                    "Can't add these waveforms; their time arrays don't line up."
-                )
-            j = i + len(wave)
-            ys[i:j] += wave.ys
+    def change_pitch(self, octaves=1.0):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        new_sample_rate = int(self_audio.frame_rate * (2.0 ** octaves))
+        result = Audio()
+        result.audio_segment = np.array(
+            self_audio.get_array_of_samples())
+        result.rate = self_audio.frame_rate
+        return result
 
-        add_ys(self)
-        add_ys(other)
-
-        return Wave(ys, ts, self.framerate)
-
-    __radd__ = __add__
-
-    def scale(self, factor):
-        self.ys *= factor
-
-    def normalize(self, amp=1.0):
-        self.ys = normalize(self.ys, amp=amp)
-
-    def write(self, filename):
-        print("Writing ", filename)
-        wfile = WavFileWriter(filename, self.framerate)
-        wfile.write(self)
-        wfile.close()
+    def play(self):
+        self_audio = AudioSegment(
+            self.audio_segment.tobytes(),
+            frame_rate=self.rate,
+            sample_width=self.audio_segment.dtype.itemsize,
+            channels=1
+        )
+        play(self_audio)
 
 
 if __name__ == "__main__":
-    filename = '../92002__jcveliz__violin-origional.wav'
-    play_wave(filename)
+    filename = "05.SMOKE.mp3"
+    audio = Audio()
+    audio.from_mp3(filename)
+    audio.play()

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AudioEditor</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="action_Open"/>
+    <addaction name="separator"/>
+    <addaction name="action_Save_2"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionS_wap"/>
+    <addaction name="action_Delete"/>
+    <addaction name="separator"/>
+    <addaction name="actionChange_Pitc_h"/>
+    <addaction name="actionChange_Volume"/>
+    <addaction name="actionChange_S_peed"/>
+    <addaction name="separator"/>
+    <addaction name="actionFade_In"/>
+    <addaction name="actionFade_Out"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="action_About"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuAbout"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionS_wap"/>
+   <addaction name="action_Delete"/>
+   <addaction name="separator"/>
+   <addaction name="actionChange_Pitc_h"/>
+   <addaction name="actionChange_Volume"/>
+   <addaction name="actionChange_S_peed"/>
+   <addaction name="separator"/>
+   <addaction name="actionFade_In"/>
+   <addaction name="actionFade_Out"/>
+   <addaction name="separator"/>
+   <addaction name="actionPlay"/>
+   <addaction name="separator"/>
+   <addaction name="action_3"/>
+   <addaction name="action_2"/>
+  </widget>
+  <action name="action_New">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/file-new.png</normaloff>resources/file-new.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionOpen_Recent">
+   <property name="text">
+    <string>Open &amp;Recent</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="action_Save_2">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionS_wap">
+   <property name="text">
+    <string>S&amp;wap</string>
+   </property>
+  </action>
+  <action name="action_Delete">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionChange_Volume">
+   <property name="text">
+    <string>Change &amp;Volume</string>
+   </property>
+  </action>
+  <action name="actionChange_S_peed">
+   <property name="text">
+    <string>Change S&amp;peed</string>
+   </property>
+  </action>
+  <action name="actionFade_In">
+   <property name="text">
+    <string>Fade &amp;In</string>
+   </property>
+  </action>
+  <action name="actionFade_Out">
+   <property name="text">
+    <string>Fade &amp;Out</string>
+   </property>
+  </action>
+  <action name="actionChange_Pitc_h">
+   <property name="text">
+    <string>Change Pitc&amp;h</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>-&gt;</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>&lt;-</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
